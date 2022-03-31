@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Grid</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      #imageContainer {
+        display: flex;
+        flex-wrap: wrap;
+      }
+
+      #imageContainer > .grid-img {
+        width: 350px;
+        height: 350px;
+        object-fit: cover;
+      }
+
+      #prevModal {
+        display: none;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background-color: #232323;
+      }
+
+      #prevModal > #prevImage {
+        position: relative;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="imageContainer"></div>
+    <div id="prevModal"></div>
+
+    <script>
+      const imageContainer = document.getElementById("imageContainer");
+      const prevModal = document.getElementById("prevModal");
+
+      (async function () {
+        try {
+          const res = await fetch("http:localhost:9000/images", {
+            method: "GET",
+            headers: {
+              path: localStorage.getItem("path"),
+            },
+          });
+
+          const images = await res.json();
+          images.map((img) => {
+            if (/[.png | .jpg | .jpeg | .gif]/.test(img)) {
+              let innerHTML = `<img src="./${localStorage.getItem(
+                "path"
+              )}/${img}" class="grid-img">`;
+              imageContainer.innerHTML += innerHTML;
+            }
+          });
+        } catch (error) {
+          console.log(error);
+        }
+      })();
+
+      window.onclick = (e) => {
+        if (e.target.className === "grid-img") {
+          prevModal.innerHTML = `<img src="${e.target.src}" id="prevImage">`;
+          prevModal.style.display = "block";
+          document.body.style.overflow = "hidden";
+
+          const prevImage = document.getElementById("prevImage");
+
+          if (prevImage.offsetWidth > prevImage.offsetHeight) {
+            prevImage.style.width = "850px";
+            console.log("ttjtje");
+          } else prevImage.style.width = "500px";
+        } else if (e.target.id === "prevModal") {
+          prevModal.innerHTML = "";
+          prevModal.style.display = "none";
+          document.body.style.overflow = "auto";
+        }
+      };
+    </script>
+  </body>
+</html>
